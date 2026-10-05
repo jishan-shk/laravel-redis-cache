@@ -24,7 +24,7 @@ trait ClearsModelCache
             return;
         }
 
-        foreach ($this->cacheTags as $tag) {
+        foreach ($this->cacheTags ?? [] as $tag) {
             $this->clearCacheByTag($tag);
         }
     }

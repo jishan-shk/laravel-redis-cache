@@ -3,43 +3,31 @@
 namespace JishanShk\RedisCache\Cache;
 
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
 use JishanShk\RedisCache\Contracts\PatternDelete;
 
 class FlushRedis
 {
     public $pattern;
-    public function __construct($pattern)
+
+    public $store;
+
+    public function __construct($pattern, $store = null)
     {
         $this->pattern = $pattern;
-        if (!(Cache::store()->getStore() instanceof PatternDelete)) {
-            // dd("Cache class doesn't implement PatternDelete interface. Are you using Redis as your cache driver?");
-
-            return;
-        }
+        $this->store = $store;
 
         $this->flush();
     }
 
     protected function flush(): void
     {
-        // Adding wildcard at front to ignore redis prefix
-        $pattern = $this->pattern ? ('*' . $this->pattern) : '*';
-        $prefix = Config::get('database.redis.options.prefix') . Cache::getStore()->getPrefix();
-        $keys = Cache::keys($pattern);
+        $store = Cache::store($this->store)->getStore();
 
-        if (empty($keys)) {
+        // Pattern deletion is only available on the redis store; other stores are left untouched
+        if (! $store instanceof PatternDelete) {
             return;
         }
 
-        $formattedKeys = array_map(function ($key) use ($prefix) {
-            return str_replace($prefix, '', $key);
-        }, $keys);
-
-        sort($formattedKeys);
-        foreach($formattedKeys as $key){
-            Cache::forget($key);
-        }
+        $store->forgetByPattern($this->pattern ? ('*' . $this->pattern) : '*');
     }
-
 }

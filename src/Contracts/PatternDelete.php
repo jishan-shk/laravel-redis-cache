@@ -5,18 +5,18 @@ namespace JishanShk\RedisCache\Contracts;
 interface PatternDelete
 {
     /**
-     * Return keys by pattern.
+     * Return the cache keys (without prefixes) matching the pattern.
      *
      * @param  string  $pattern
-     * @return mixed
+     * @return array
      */
     public function keys(string $pattern = '*'): array;
 
     /**
-     * Forget keys by pattern.
+     * Forget every cache key matching the pattern.
      *
      * @param  string  $pattern
-     * @return mixed
+     * @return bool
      */
     public function forgetByPattern(string $pattern): bool;
 }

@@ -4,6 +4,7 @@ namespace JishanShk\RedisCache\Services;
 
 use Illuminate\Support\Facades\Cache;
 use JishanShk\RedisCache\Cache\FlushRedis;
+use JishanShk\RedisCache\Cache\RedisStore;
 
 class ListCacheService
 {
@@ -45,6 +46,6 @@ class ListCacheService
      */
     public function invalidate(string $tag): void
     {
-        new FlushRedis(generateTaggedCacheKey($tag) . '*');
+        new FlushRedis(RedisStore::escapePattern(generateTaggedCacheKey($tag)) . '*');
     }
 }
